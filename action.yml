@@ -33,4 +33,5 @@ runs:
       shell: bash
       env:
         GO: ${{ inputs.go || 'go' }}
-      run: "$GO" run "${{ github.action_path }}" --max-size="${{ inputs.max-size }}" "${{ inputs.base }}" "${{ inputs.head }}"
+      run: |
+        "$GO" run "${{ github.action_path }}" --max-size="${{ inputs.max-size }}" "${{ inputs.base }}" "${{ inputs.head }}"
