@@ -17,15 +17,23 @@ import (
 	"strings"
 )
 
-var maxSize = flag.Int64("max-size", 1_000_000, "maximum blob size in bytes")
+var (
+	maxSize = flag.Int64("max-size", 1_000_000, "maximum blob size in bytes")
+	chdir   = flag.String("C", "", "change to `directory` before running")
+)
 
 func main() {
 	log.SetPrefix("check-large-files: ")
 	log.SetFlags(0)
 	flag.Parse()
 	if flag.NArg() != 2 {
-		fmt.Fprintf(os.Stderr, "usage: check-git-accidental-large-file [--max-size=N] <before> <after>\n")
+		fmt.Fprintf(os.Stderr, "usage: check-git-accidental-large-file [--max-size=N] [-C=dir] <before> <after>\n")
 		os.Exit(2)
+	}
+	if *chdir != "" {
+		if err := os.Chdir(*chdir); err != nil {
+			log.Fatalf("chdir to %s: %v", *chdir, err)
+		}
 	}
 
 	beforeTree := resolveTree(flag.Arg(0))

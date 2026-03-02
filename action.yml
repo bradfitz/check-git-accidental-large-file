@@ -34,4 +34,5 @@ runs:
       env:
         GO: ${{ inputs.go || 'go' }}
       run: |
-        "$GO" run "${{ github.action_path }}" --max-size="${{ inputs.max-size }}" "${{ inputs.base }}" "${{ inputs.head }}"
+        cd "${{ github.action_path }}"
+        "$GO" run . -C "${{ github.workspace }}" --max-size="${{ inputs.max-size }}" "${{ inputs.base }}" "${{ inputs.head }}"
