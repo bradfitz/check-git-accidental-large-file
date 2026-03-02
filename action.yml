@@ -1,0 +1,36 @@
+name: 'Check for accidental large files'
+description: >
+  Compares two git tree-ishes and reports any new or changed blobs exceeding a
+  size threshold. Ignores deletions and submodules.
+
+inputs:
+  base:
+    description: 'Base git ref (the "before" state)'
+    required: true
+  head:
+    description: 'Head git ref (the "after" state)'
+    required: true
+  max-size:
+    description: 'Maximum blob size in bytes (default 1000000 = ~1 MB)'
+    required: false
+    default: '1000000'
+  go:
+    description: 'Path to the Go binary. If empty, Go is installed automatically via actions/setup-go.'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Go
+      if: inputs.go == ''
+      uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # @v5
+      with:
+        go-version-file: ${{ github.action_path }}/go.mod
+        cache: false
+
+    - name: Check for large files
+      shell: bash
+      env:
+        GO: ${{ inputs.go || 'go' }}
+      run: "$GO" run "${{ github.action_path }}" --max-size="${{ inputs.max-size }}" "${{ inputs.base }}" "${{ inputs.head }}"
